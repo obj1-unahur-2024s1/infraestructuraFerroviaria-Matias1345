@@ -1,0 +1,108 @@
+import vagones.*
+import formaciones.*
+import locomotoras.*
+
+describe "test"{
+	//Vagones
+	const vagonPasajeros1 = new VagonPasajeros(largo = 10, ancho = 4, tieneBanio = true, estaOrdenado = true)
+	const vagonPasajeros2 = new VagonPasajeros(largo = 7, ancho = 2, tieneBanio = false, estaOrdenado = false)
+	const vagonCarga3 = new VagonCarga(cargaMaxIdeal = 6800, maderasSueltas = 5)
+	const vagonDormitorio4 = new VagonDormitorio(cantCompartimentos = 8, camasXcompartimento = 3)
+	const vagonCarga5 = new VagonCarga(cargaMaxIdeal = 8000, maderasSueltas = 1)
+	const vagonDormitorio6 = new VagonDormitorio(cantCompartimentos = 15, camasXcompartimento = 4)
+	
+	//Locomotoras
+	const locomotora1 = new Locomotora(peso = 3000, cuantoPuedeArrastrar = 20000, velocidadMax = 25)
+	const locomotora2 = new Locomotora(peso = 5000, cuantoPuedeArrastrar = 22000, velocidadMax = 20)
+	
+	//Formaciones
+	const formacion1 = new Formacion()
+	const formacion2 = new Formacion()
+	
+	method initialize(){
+		formacion1.agregarVagon(vagonPasajeros1)
+		formacion1.agregarVagon(vagonPasajeros2)
+		formacion1.agregarVagon(vagonCarga3)
+		formacion1.agregarVagon(vagonDormitorio4)
+		
+		formacion2.agregarVagon(vagonCarga5)
+		formacion2.agregarVagon(vagonDormitorio6)
+	}
+	
+	test "Cantidad de pasajeros de los vagones de la Formacion 1"{
+		assert.equals(100,vagonPasajeros1.cantidadPasajeros())
+		assert.equals(41,vagonPasajeros2.cantidadPasajeros())
+		assert.equals(0,vagonCarga3.cantidadPasajeros())
+		assert.equals(24,vagonDormitorio4.cantidadPasajeros())
+	}
+	
+	test "Peso maximo de los vagones de la Formacion 1"{
+		assert.equals(10300,vagonPasajeros1.pesoMaximo())
+		assert.equals(6080,vagonPasajeros2.pesoMaximo())
+		assert.equals(6300,vagonCarga3.pesoMaximo())
+		assert.equals(7120,vagonDormitorio4.pesoMaximo())
+	}
+	
+	test "Carga maxima de los vagones de la Formacion 1"{
+		assert.equals(300,vagonPasajeros1.maximoCarga())
+		assert.equals(800,vagonPasajeros2.maximoCarga())
+		assert.equals(4800,vagonCarga3.maximoCarga())
+		assert.equals(1200,vagonDormitorio4.maximoCarga())
+	}
+	
+	test "Banio de los vagones de la Formacion 1"{
+		assert.that(vagonPasajeros1.tieneBanio())
+		assert.notThat(vagonPasajeros2.tieneBanio())
+		assert.notThat(vagonCarga3.tieneBanio())
+		assert.that(vagonDormitorio4.tieneBanio())
+	}
+	
+	test "Formacion1 antes del mantenimiento"{
+		assert.equals(165,formacion1.pasajerosQuePuedeLlevar())
+		assert.equals(1,formacion1.cantVagonesPopulares())
+		assert.notThat(formacion1.esFormacionCarguera())
+		assert.equals(4220,formacion1.dispersionDePesos())
+		assert.equals(2,formacion1.cuantosBaniosTiene())
+	}
+	
+	test "Formacion1 despues del mantenimiento"{
+		formacion1.realizarMantenimiento()
+		assert.equals(180,formacion1.pasajerosQuePuedeLlevar())
+		assert.equals(2,formacion1.cantVagonesPopulares())
+		assert.notThat(formacion1.esFormacionCarguera())
+		assert.equals(3200,formacion1.dispersionDePesos())
+		assert.equals(2,formacion1.cuantosBaniosTiene())
+	}
+	
+	test "Formacion2 antes del mantenimiento"{
+		assert.equals(60,formacion2.pasajerosQuePuedeLlevar())
+		assert.equals(1,formacion2.cantVagonesPopulares())
+		assert.that(formacion2.esFormacionCarguera())
+		assert.equals(900,formacion2.dispersionDePesos())
+		assert.equals(1,formacion2.cuantosBaniosTiene())
+	}
+	
+	test "Formacion2 despues del mantenimiento"{
+		formacion2.realizarMantenimiento()
+		assert.equals(60,formacion2.pasajerosQuePuedeLlevar())
+		assert.equals(1,formacion2.cantVagonesPopulares())
+		assert.that(formacion2.esFormacionCarguera())
+		assert.equals(500,formacion2.dispersionDePesos())
+		assert.equals(1,formacion2.cuantosBaniosTiene())
+	}
+	
+	test "Se agregar Locomotora 1 a Formacion 1"{
+		formacion1.agregarVagon(locomotora1)
+		assert.that(formacion1.esEficiente())
+		assert.notThat(formacion1.puedeMoverse())
+		assert.equals(12800,formacion1.kilosEmpujeFaltantes())
+	}
+	
+	test "Se agregar Locomotora 1 y Locomotora 2 a Formacion 1"{
+		formacion1.agregarVagon(locomotora1)
+		formacion1.agregarVagon(locomotora2)
+		assert.notThat(formacion1.esEficiente())
+		assert.that(formacion1.puedeMoverse())
+		assert.equals(0,formacion1.kilosEmpujeFaltantes())
+	}
+}
